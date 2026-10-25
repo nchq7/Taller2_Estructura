@@ -1,17 +1,32 @@
 #include <iostream>
-#include "dominio/Paciente.h"
+#include "logica/LectorPacientes.h"
+#include "logica/ColaPacientes.h"
 
 using namespace std;
 
 int main() {
-    Paciente paciente("001", "Juan Perez", 25, 37.0, 120,
-                      3, "otro", false, false, false, 0);
-
     cout << "=== HOSPITAL MARMAJA ===" << endl;
-    cout << "ID: " << paciente.getId() << endl;
-    cout << "Nombre: " << paciente.getNombre() << endl;
-    cout << "Edad: " << paciente.getEdad() << endl;
-    cout << "Temperatura: " << paciente.getTemperatura() << endl;
+
+    ColaPacientes cola;
+
+    int cargados = LectorPacientes::cargarArchivo(
+        "datos/pacientes.txt", cola
+    );
+
+    if (cargados == -1) {
+        return 1;
+    }
+
+    cout << "Pacientes cargados: " << cargados << endl;
+
+    cout << "\n=== COLA DE PACIENTES ===" << endl;
+
+    while (!cola.estaVacia()) {
+        Paciente paciente = cola.desencolar();
+
+        cout << paciente.getId() << " - "
+             << paciente.getNombre() << endl;
+    }
 
     return 0;
 }

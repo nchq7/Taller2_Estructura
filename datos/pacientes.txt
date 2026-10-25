@@ -1,0 +1,5 @@
+001;Juan Perez;25;37.0;120;3;otro;0;0;0;0
+002;Maria Lopez;12;36.5;110;2;cabeza;0;0;0;0
+003;Pedro Soto;45;38.0;130;8;extremidad;1;0;0;0
+004;Ana Torres;60;37.2;140;5;pecho;0;0;0;0
+005;Carlos Diaz;35;36.8;120;6;cabeza;0;1;0;0
