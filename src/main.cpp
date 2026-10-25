@@ -1,6 +1,6 @@
 #include <iostream>
 #include "logica/LectorPacientes.h"
-#include "logica/ColaPacientes.h"
+#include "logica/ArbolDecision.h"
 
 using namespace std;
 
@@ -8,6 +8,7 @@ int main() {
     cout << "=== HOSPITAL MARMAJA ===" << endl;
 
     ColaPacientes cola;
+    ArbolDecision arbol;
 
     int cargados = LectorPacientes::cargarArchivo(
         "datos/pacientes.txt", cola
@@ -19,13 +20,24 @@ int main() {
 
     cout << "Pacientes cargados: " << cargados << endl;
 
-    cout << "\n=== COLA DE PACIENTES ===" << endl;
-
     while (!cola.estaVacia()) {
         Paciente paciente = cola.desencolar();
 
-        cout << paciente.getId() << " - "
-             << paciente.getNombre() << endl;
+        try {
+            auto resultado = arbol.clasificar(paciente);
+
+            cout << "\nPaciente: "
+                 << paciente.getNombre() << endl;
+
+            cout << "Ruta: "
+                 << resultado.ruta << endl;
+
+            cout << "Servicio: "
+                 << nombreServicio(resultado.servicio) << endl;
+
+        } catch (const exception& error) {
+            cerr << "Error: " << error.what() << endl;
+        }
     }
 
     return 0;
