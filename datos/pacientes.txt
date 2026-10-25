@@ -3,3 +3,6 @@
 003;Pedro Soto;45;38.0;130;8;extremidad;1;0;0;0
 004;Ana Torres;60;37.2;140;5;pecho;0;0;0;0
 005;Carlos Diaz;35;36.8;120;6;cabeza;0;1;0;0
+006;Sofia Rojas;40;37.0;120;3;abdomen;0;0;1;0
+007;Luis Vega;28;39.1;120;2;otro;0;0;0;0
+008;Elena Ruiz;50;37.0;120;2;otro;0;0;0;4

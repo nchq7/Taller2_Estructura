@@ -18,6 +18,9 @@ public:
     ArbolDecision& operator=(const ArbolDecision&) = delete;
 
     Resultado clasificar(const Paciente& paciente) const;
+    void mostrarPreorden() const;
+    void mostrarInorden() const;
+    void mostrarPostorden() const;
 
 private:
      enum class Pregunta {
@@ -47,6 +50,11 @@ private:
               servicio(s), si(nullptr), no(nullptr) {}
     };
 
+    static void imprimirNodo(const Nodo* nodo);
+    static void preorden(const Nodo* nodo);
+    static void inorden(const Nodo* nodo);
+    static void postorden(const Nodo* nodo);
+    
     Nodo* raiz;
 
     static bool cumple(Pregunta pregunta, const Paciente& paciente);

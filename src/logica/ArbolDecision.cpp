@@ -1,6 +1,7 @@
 #include "logica/ArbolDecision.h"
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 ArbolDecision::ArbolDecision() {
     raiz = new Nodo(Pregunta::Cirugia);
@@ -151,4 +152,53 @@ void ArbolDecision::liberar(Nodo* nodo) {
 
 ArbolDecision::~ArbolDecision() {
     liberar(raiz);
+}
+
+void ArbolDecision::imprimirNodo(const Nodo* nodo) {
+    if (nodo->esHoja) {
+        std::cout << "[Servicio] "
+                  << nombreServicio(nodo->servicio) << "\n";
+    } else {
+        std::cout << "[Pregunta] "
+                  << describir(nodo->pregunta) << "\n";
+    }
+}
+
+void ArbolDecision::preorden(const Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    imprimirNodo(nodo);
+    preorden(nodo->si);
+    preorden(nodo->no);
+}
+
+void ArbolDecision::inorden(const Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    inorden(nodo->si);
+    imprimirNodo(nodo);
+    inorden(nodo->no);
+}
+
+void ArbolDecision::postorden(const Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    postorden(nodo->si);
+    postorden(nodo->no);
+    imprimirNodo(nodo);
+}
+
+void ArbolDecision::mostrarPreorden() const {
+    std::cout << "\n=== Preorden ===\n";
+    preorden(raiz);
+}
+
+void ArbolDecision::mostrarInorden() const {
+    std::cout << "\n=== Inorden ===\n";
+    inorden(raiz);
+}
+
+void ArbolDecision::mostrarPostorden() const {
+    std::cout << "\n=== Postorden ===\n";
+    postorden(raiz);
 }
