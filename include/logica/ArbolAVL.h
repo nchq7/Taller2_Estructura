@@ -32,7 +32,17 @@ private:
 
     static void recorrerInorden(const Nodo* nodo);
     static void liberar(Nodo* nodo);
+    
+    static Nodo* buscarMenor(Nodo* nodo);
+    static Nodo* eliminarRec(Nodo* nodo,const std::string& id,bool& eliminado);
 
+    static const Paciente* buscarNombreRec(
+    const Nodo* nodo,
+    const std::string& nombre);
+
+    static void recorrerPreorden(const Nodo* nodo);
+    static void recorrerPostorden(const Nodo* nodo);
+    static void mostrarBalancesRec(Nodo* nodo);
 public:
     ArbolAVL();
     ~ArbolAVL();
@@ -44,4 +54,12 @@ public:
     const Paciente* buscarPorId(const std::string& id) const;
     int obtenerAltura() const;
     void mostrarInorden() const;
+    bool eliminar(const std::string& id);
+
+    const Paciente* buscarPorNombre(
+        const std::string& nombre) const;
+
+    void mostrarPreorden() const;
+    void mostrarPostorden() const;
+    void mostrarFactoresBalance() const;
 };

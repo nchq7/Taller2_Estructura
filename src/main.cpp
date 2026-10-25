@@ -65,6 +65,55 @@ int main() {
 
     avl.mostrarInorden();
 
-    cout << "Altura AVL: " << avl.obtenerAltura() << endl;        
+    cout << "Altura AVL: " << avl.obtenerAltura() << endl;     
+
+    auto crearPaciente = [](const std::string& id) {
+        return Paciente(id, "Paciente " + id,
+                        30, 37.0, 120, 2, "otro",
+                        false, false, false, 0);
+    };
+
+    auto probarRotacion = [&](const std::string& a,
+                            const std::string& b,
+                            const std::string& c) {
+        ArbolAVL arbol;
+
+        assert(arbol.insertar(crearPaciente(a)));
+        assert(arbol.insertar(crearPaciente(b)));
+        assert(arbol.insertar(crearPaciente(c)));
+
+        assert(arbol.obtenerAltura() == 2);
+        assert(arbol.buscarPorId("020") != nullptr);
+    };
+
+    probarRotacion("030", "020", "010");
+    probarRotacion("010", "020", "030"); 
+    probarRotacion("030", "010", "020"); 
+    probarRotacion("010", "030", "020"); 
+
+    cout << "\nLas 4 rotaciones pasaron la prueba." << endl;
+
+    ArbolAVL pruebaEliminar;
+
+    pruebaEliminar.insertar(crearPaciente("020"));
+    pruebaEliminar.insertar(crearPaciente("010"));
+    pruebaEliminar.insertar(crearPaciente("030"));
+
+    assert(pruebaEliminar.eliminar("020"));
+    assert(pruebaEliminar.buscarPorId("020") == nullptr);
+    assert(pruebaEliminar.buscarPorId("010") != nullptr);
+    assert(pruebaEliminar.buscarPorId("030") != nullptr);
+    assert(!pruebaEliminar.eliminar("999"));
+
+    cout << "Eliminacion AVL correcta." << endl;
+
+    assert(
+        pruebaEliminar.buscarPorNombre("Paciente 010") != nullptr
+    );
+
+    pruebaEliminar.mostrarPreorden();
+    pruebaEliminar.mostrarPostorden();
+    pruebaEliminar.mostrarFactoresBalance();
+    
     return 0;
 }

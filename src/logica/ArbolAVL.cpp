@@ -156,3 +156,162 @@ void ArbolAVL::liberar(Nodo* nodo) {
 ArbolAVL::~ArbolAVL() {
     liberar(raiz);
 }
+
+ArbolAVL::Nodo* ArbolAVL::buscarMenor(Nodo* nodo) {
+    Nodo* actual = nodo;
+
+    while (actual->izquierdo != nullptr) {
+        actual = actual->izquierdo;
+    }
+
+    return actual;
+}
+
+ArbolAVL::Nodo* ArbolAVL::eliminarRec(
+    Nodo* nodo, const std::string& id, bool& eliminado) {
+
+    if (nodo == nullptr) {
+        return nullptr;
+    }
+
+    if (id < nodo->paciente.getId()) {
+        nodo->izquierdo = eliminarRec(
+            nodo->izquierdo, id, eliminado
+        );
+    }
+    else if (id > nodo->paciente.getId()) {
+        nodo->derecho = eliminarRec(
+            nodo->derecho, id, eliminado
+        );
+    }
+    else {
+        eliminado = true;
+        if (nodo->izquierdo == nullptr ||
+            nodo->derecho == nullptr) {
+
+            Nodo* hijo = nodo->izquierdo != nullptr
+                       ? nodo->izquierdo
+                       : nodo->derecho;
+
+            delete nodo;
+            return hijo;
+        }
+
+        Nodo* sucesor = buscarMenor(nodo->derecho);
+
+        std::string idSucesor = sucesor->paciente.getId();
+        nodo->paciente = sucesor->paciente;
+
+        bool eliminadoSucesor = false;
+        nodo->derecho = eliminarRec(
+            nodo->derecho, idSucesor, eliminadoSucesor
+        );
+    }
+
+    actualizarAltura(nodo);
+
+    int balance = factorBalance(nodo);
+    if (balance > 1) {
+        if (factorBalance(nodo->izquierdo) < 0) {
+            nodo->izquierdo =
+                rotarIzquierda(nodo->izquierdo);
+        }
+
+        return rotarDerecha(nodo);
+    }
+
+    if (balance < -1) {
+        if (factorBalance(nodo->derecho) > 0) {
+            nodo->derecho =
+                rotarDerecha(nodo->derecho);
+        }
+
+        return rotarIzquierda(nodo);
+    }
+
+    return nodo;
+}
+
+bool ArbolAVL::eliminar(const std::string& id) {
+    bool eliminado = false;
+    raiz = eliminarRec(raiz, id, eliminado);
+    return eliminado;
+}
+
+const Paciente* ArbolAVL::buscarNombreRec(
+    const Nodo* nodo, const std::string& nombre) {
+
+    if (nodo == nullptr) {
+        return nullptr;
+    }
+
+    if (nodo->paciente.getNombre() == nombre) {
+        return &nodo->paciente;
+    }
+
+    const Paciente* encontrado = buscarNombreRec(
+        nodo->izquierdo, nombre
+    );
+
+    if (encontrado != nullptr) {
+        return encontrado;
+    }
+
+    return buscarNombreRec(nodo->derecho, nombre);
+}
+
+const Paciente* ArbolAVL::buscarPorNombre(
+    const std::string& nombre) const {
+
+    return buscarNombreRec(raiz, nombre);
+}
+
+void ArbolAVL::recorrerPreorden(const Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    std::cout << nodo->paciente.getId()
+              << " - " << nodo->paciente.getNombre()
+              << "\n";
+
+    recorrerPreorden(nodo->izquierdo);
+    recorrerPreorden(nodo->derecho);
+}
+
+void ArbolAVL::recorrerPostorden(const Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    recorrerPostorden(nodo->izquierdo);
+    recorrerPostorden(nodo->derecho);
+
+    std::cout << nodo->paciente.getId()
+              << " - " << nodo->paciente.getNombre()
+              << "\n";
+}
+
+void ArbolAVL::mostrarPreorden() const {
+    std::cout << "\n=== AVL PREORDEN ===\n";
+    recorrerPreorden(raiz);
+}
+
+void ArbolAVL::mostrarPostorden() const {
+    std::cout << "\n=== AVL POSTORDEN ===\n";
+    recorrerPostorden(raiz);
+}
+
+void ArbolAVL::mostrarBalancesRec(Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    mostrarBalancesRec(nodo->izquierdo);
+
+    std::cout << "ID: " << nodo->paciente.getId()
+              << " | Altura: " << nodo->altura
+              << " | Balance: " << factorBalance(nodo)
+              << "\n";
+
+    mostrarBalancesRec(nodo->derecho);
+}
+
+void ArbolAVL::mostrarFactoresBalance() const {
+    std::cout << "\n=== FACTORES DE BALANCE ===\n";
+    mostrarBalancesRec(raiz);
+}
