@@ -1,119 +1,135 @@
+
 #include <iostream>
+#include <string>
+#include <limits>
+#include "logica/Hospital.h"
 #include "logica/LectorPacientes.h"
-#include "logica/ArbolDecision.h"
-#include "logica/ArbolAVL.h"
-#include <cassert>
+
 using namespace std;
 
 int main() {
-    cout << "=== HOSPITAL MARMAJA ===" << endl;
-
+    Hospital hospital;
     ColaPacientes cola;
-    ArbolDecision arbol;
 
     int cargados = LectorPacientes::cargarArchivo(
         "datos/pacientes.txt", cola
     );
 
-    if (cargados == -1) {
-        return 1;
+    if (cargados >= 0) {
+        cout << "Pacientes en espera: "
+             << cargados << "\n";
+    } else {
+        cout << "No se pudo cargar el archivo.\n";
     }
 
-    cout << "Pacientes cargados: " << cargados << endl;
+    int opcion = 0;
 
-    while (!cola.estaVacia()) {
-        Paciente paciente = cola.desencolar();
+    do {
+        cout << "\n=== HOSPITAL MARMAJA ===\n";
+        cout << "1. Atender pacientes\n";
+        cout << "2. Ver departamentos\n";
+        cout << "3. Buscar paciente\n";
+        cout << "4. Eliminar paciente\n";
+        cout << "5. Salir\n";
+        cout << "Seleccione una opcion: ";
 
-        try {
-            auto resultado = arbol.clasificar(paciente);
+        if (!(cin >> opcion)) {
+            if (cin.eof()) break;
 
-            cout << "\nPaciente: "
-                 << paciente.getNombre() << endl;
-
-            cout << "Ruta: "
-                 << resultado.ruta << endl;
-
-            cout << "Servicio: "
-                 << nombreServicio(resultado.servicio) << endl;
-
-        } catch (const exception& error) {
-            cerr << "Error: " << error.what() << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Opcion invalida.\n";
+            continue;
         }
-    }
-    
-    arbol.mostrarPreorden();
-    arbol.mostrarInorden();
-    arbol.mostrarPostorden();
 
-    cout << "\n=== PROBANDO AVL ===" << endl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    ArbolAVL avl;
+        switch (opcion) {
+            case 1: {
+                cout << "\n=== ATENDIENDO PACIENTES ===\n";
 
-    Paciente p30("030", "Paciente A", 30, 37,120,2,"otro",false,false,false, 0);
+                int atendidos = hospital.atenderPacientes(cola);
 
-    Paciente p20("020","Paciente B", 30, 37,120,2,"otro",false,false,false, 0);
+                cout << "\nPacientes atendidos: "
+                     << atendidos << "\n";
+                break;
+            }
 
-    Paciente p10("010", "Paciente C", 30, 37, 120, 2, "otro", false, false, false, 0);
+            case 2: {
+                hospital.mostrarDepartamentos();
+                break;
+            }
 
-    assert(avl.insertar(p30));
-    assert(avl.insertar(p20));
-    assert(avl.insertar(p10));
+            case 3: {
+                string consulta;
+                cout << "Ingrese ID o nombre: ";
+                getline(cin, consulta);
 
-    assert(avl.obtenerAltura() == 2);
-    assert(avl.buscarPorId("020") != nullptr);
-    assert(!avl.insertar(p20));
+                Servicio servicio = Servicio::MedicinaGeneral;
 
-    avl.mostrarInorden();
+                const Paciente* paciente =
+                    hospital.buscarPorId(consulta, servicio);
 
-    cout << "Altura AVL: " << avl.obtenerAltura() << endl;     
+                if (paciente == nullptr) {
+                    paciente = hospital.buscarPorNombre(
+                        consulta, servicio
+                    );
+                }
 
-    auto crearPaciente = [](const std::string& id) {
-        return Paciente(id, "Paciente " + id,
-                        30, 37.0, 120, 2, "otro",
-                        false, false, false, 0);
-    };
+                if (paciente == nullptr) {
+                    cout << "Paciente no encontrado.\n";
+                } else {
+                    cout << "\nPaciente encontrado:\n";
+                    cout << "ID: " << paciente->getId() << "\n";
+                    cout << "Nombre: "
+                         << paciente->getNombre() << "\n";
+                    cout << "Edad: "
+                         << paciente->getEdad() << "\n";
+                    cout << "Temperatura: "
+                         << paciente->getTemperatura() << "\n";
+                    cout << "Presion: "
+                         << paciente->getPresionArterial() << "\n";
+                    cout << "Dolor: "
+                         << paciente->getDolor() << "\n";
+                    cout << "Tipo dolor: "
+                         << paciente->getTipoDolor() << "\n";
+                    cout << "Trauma: "
+                         << paciente->getTrauma() << "\n";
+                    cout << "Sintomas neurologicos: "
+                         << paciente->getSintomasNeurologicos() << "\n";
+                    cout << "Requiere cirugia: "
+                         << paciente->getRequiereCirugia() << "\n";
+                    cout << "Dias hospitalizacion: "
+                         << paciente->getDiasHospitalizacion() << "\n";
+                    cout << "Servicio: "
+                         << nombreServicio(servicio) << "\n";
+                }
+                break;
+            }
 
-    auto probarRotacion = [&](const std::string& a,
-                            const std::string& b,
-                            const std::string& c) {
-        ArbolAVL arbol;
+            case 4: {
+                string id;
+                cout << "ID del paciente a eliminar: ";
+                getline(cin, id);
 
-        assert(arbol.insertar(crearPaciente(a)));
-        assert(arbol.insertar(crearPaciente(b)));
-        assert(arbol.insertar(crearPaciente(c)));
+                if (hospital.eliminarPaciente(id)) {
+                    cout << "Paciente eliminado correctamente.\n";
+                } else {
+                    cout << "Paciente no encontrado.\n";
+                }
+                break;
+            }
 
-        assert(arbol.obtenerAltura() == 2);
-        assert(arbol.buscarPorId("020") != nullptr);
-    };
+            case 5:
+                cout << "Saliendo del hospital...\n";
+                break;
 
-    probarRotacion("030", "020", "010");
-    probarRotacion("010", "020", "030"); 
-    probarRotacion("030", "010", "020"); 
-    probarRotacion("010", "030", "020"); 
+            default:
+                cout << "Opcion no valida.\n";
+                break;
+        }
 
-    cout << "\nLas 4 rotaciones pasaron la prueba." << endl;
+    } while (opcion != 5);
 
-    ArbolAVL pruebaEliminar;
-
-    pruebaEliminar.insertar(crearPaciente("020"));
-    pruebaEliminar.insertar(crearPaciente("010"));
-    pruebaEliminar.insertar(crearPaciente("030"));
-
-    assert(pruebaEliminar.eliminar("020"));
-    assert(pruebaEliminar.buscarPorId("020") == nullptr);
-    assert(pruebaEliminar.buscarPorId("010") != nullptr);
-    assert(pruebaEliminar.buscarPorId("030") != nullptr);
-    assert(!pruebaEliminar.eliminar("999"));
-
-    cout << "Eliminacion AVL correcta." << endl;
-
-    assert(
-        pruebaEliminar.buscarPorNombre("Paciente 010") != nullptr
-    );
-
-    pruebaEliminar.mostrarPreorden();
-    pruebaEliminar.mostrarPostorden();
-    pruebaEliminar.mostrarFactoresBalance();
-    
     return 0;
 }
